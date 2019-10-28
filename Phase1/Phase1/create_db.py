@@ -1,4 +1,6 @@
-# Run these in a manage.py shell
+# open terminal from project location where you can see manage.py
+# type python manage.py shell
+# then exec these codes line by line in the new shell
 import pandas as pd
 from search import models
 import re
@@ -9,11 +11,12 @@ date_pattern = r"(\w*)\s(\d{1,2})\w{2}\s(\d{4}),\s(\d{2}:\d{2}:\d{2})"
 prog = re.compile(pattern=date_pattern)
 df = pd.read_excel(path)
 
-# This should be commented out
+# This should be commented out at last to use the whole dataset
 ###############################
 df = df[:10]  # ###############
 ###############################
 
+# This populates the database
 for row in df.iterrows():
     parts = prog.match(row[1]["publish_date"]).groups()
     f_date = "{} {} {} {}".format(parts[0], parts[1], parts[2], parts[3])

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>
+        {{ news.title }}
+    </h1>
+    <p>
+        {{ news.publish_date }}
+    </p>
+    <br>
+    {{ news.content }}
+    <br>
+    <img alt={{ news.thumbnail }}, src={{ news.thumbnail }}>
+{% endblock %}

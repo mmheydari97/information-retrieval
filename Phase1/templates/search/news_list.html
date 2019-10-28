@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% for news in news_list %}
+        <div class="news">
+            <h1><a href="{% url 'news_detail' pk=news.pk %}">{{ news.title }}</a></h1>
+            <div class="date">
+                <p>Published on: {{news.publish_date|date:"D M Y"}}</p>
+            </div>
+
+            <p>
+                {{ news.summary }}
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+{% endblock %}
