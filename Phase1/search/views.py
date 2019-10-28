@@ -10,9 +10,13 @@ query = None
 
 
 def search(request):
-    if not request.POST or request.POST["query"] == "":
-        return render(request, "index.html")
+    if not request.POST:
+        # TODO: will be executed once
+        # place of init process for posting list etc.
 
+        return render(request, "index.html")
+    elif request.POST["query"] == "":
+        return render(request, "index.html")
     else:
         global query
         query = request.POST["query"]
