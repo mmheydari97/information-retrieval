@@ -4,15 +4,27 @@
 
     <div class="jumbotron">
 
+        <h1 class="display-5 d-flex justify-content-right">
+            خوش آمدید!
+
+        </h1>
+
+        <p class="lead">
+            برای شروع عبارتی را در قسمت پرسمان وارد کنید:
+        </p>
+
+        <hr class="my-4">
+
         <form method="POST">
             <div class="form-group mb-2">
 
             {%  csrf_token %}
-            <label>
+            <label id="query_input">
                 <input type="text" placeholder="پرسمان" name="query" class="form-control form-control-lg">
             </label>
-            <button type="submit" class="btn btn-lg btn-primary form-control form-control-lg">جستجو</button>
-
+                <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-lg btn-primary form-control form-control-lg col-lg-6 ">جستجو</button>
+                </div>
             </div>
         </form>
 

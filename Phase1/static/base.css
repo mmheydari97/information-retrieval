@@ -1,5 +1,13 @@
 body{
     direction: rtl;
+    text-align: right;
+    font-family: 'B Homa';
+    font-size: 20px;
+}
+
+p{
+    direction: rtl;
+    text-align: right;
 }
 
 #main_content{
@@ -9,4 +17,11 @@ body{
 .navbar{
     background: linear-gradient(-45deg, #23a6d5, #23d5ab)!important;
     color: white!important;
+    -webkit-box-shadow: 0 8px 6px -3px #999;
+    -moz-box-shadow: 0 8px 6px -3px #999;
+    box-shadow: 0 8px 6px -3px #999;
+}
+
+#query_input{
+    width: 100%;
 }
