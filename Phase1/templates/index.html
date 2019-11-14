@@ -1,13 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <form method="POST">
-        {%  csrf_token %}
-        <label>
-            <input type="text" placeholder="Query" name="query">
-        </label>
-        <button type="submit">click here</button>
 
-    </form>
+    <div class="jumbotron">
+
+        <form method="POST">
+            <div class="form-group mb-2">
+
+            {%  csrf_token %}
+            <label>
+                <input type="text" placeholder="پرسمان" name="query" class="form-control form-control-lg">
+            </label>
+            <button type="submit" class="btn btn-lg btn-primary form-control form-control-lg">جستجو</button>
+
+            </div>
+        </form>
+
+    </div>
 
 {% endblock %}

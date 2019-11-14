@@ -1,5 +1,12 @@
-h1{
+body{
     direction: rtl;
-    text-align: center;
-    color: crimson;
+}
+
+#main_content{
+    margin-top: 100px;
+}
+
+.navbar{
+    background: linear-gradient(-45deg, #23a6d5, #23d5ab)!important;
+    color: white!important;
 }

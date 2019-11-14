@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% block navigation %}
+    <li class="nav-item active">
+        <a class="nav-link" href="{% url "search" %}">خانه <span class="sr-only">(current)</span></a>
+    </li>
+
+    <li class="nav-item active">
+        <a class="nav-link" href="{% url "news_list" %}">لیست اخبار <span class="sr-only">(current)</span></a>
+    </li>
+{% endblock %}
+
 {% block content %}
     <h1>
         {{ news.title }}
@@ -8,7 +18,7 @@
         {{ news.publish_date }}
     </p>
     <br>
-    {{ news.content }}
+    {{ news.content | safe }}
     <br>
     <img alt={{ news.thumbnail }}, src={{ news.thumbnail }}>
 {% endblock %}
