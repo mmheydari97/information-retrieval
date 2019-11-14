@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load search_extras %}
+
 {% block navigation %}
     <li class="nav-item active">
             <a class="nav-link" href="{% url "search" %}">خانه <span class="sr-only">(current)</span></a>
@@ -9,19 +11,25 @@
 
 {% block content %}
 
+    <div class="jumbotron">
+
     {% for news in news_list %}
-        <div class="news">
-            <h1><a href="{% url 'news_detail' pk=news.pk %}">{{ news.title }}</a></h1>
-            <div class="date">
-                <p>Published on: {{news.publish_date|date:"D d M Y"}}</p>
-            </div>
+        <div class="card">
+                <div class="card-body">
 
-            <p>
-                {{ news.summary }}
-            </p>
+                    <h3><a href="{% url 'news_detail' pk=news.pk %}">{{ news.title }}</a></h3>
 
+
+                    <div class="date">
+                        <p> تاریخ انتشار: {{news.publish_date|date:"D d M Y"| farsi_date}}</p>
+                    </div>
+
+                    <p>
+                        {{ news.summary }}
+                    </p>
+                </div>
         </div>
 
     {% endfor %}
-
+    </div>
 {% endblock %}

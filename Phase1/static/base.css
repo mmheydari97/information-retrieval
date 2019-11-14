@@ -25,3 +25,18 @@ p{
 #query_input{
     width: 100%;
 }
+
+
+#news_image{
+    width: 100%;
+    margin: auto;
+}
+
+#news_image.img{
+    width: 100%;
+    height: auto;
+}
+
+.card{
+    margin-bottom: 20px;
+}

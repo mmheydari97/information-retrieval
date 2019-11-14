@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load search_extras %}
+
 {% block navigation %}
     <li class="nav-item active">
         <a class="nav-link" href="{% url "search" %}">خانه <span class="sr-only">(current)</span></a>
@@ -15,10 +17,17 @@
         {{ news.title }}
     </h1>
     <p>
-        {{ news.publish_date }}
+    تاریخ انتشار:
+        {{ news.publish_date |date:"D d M Y"| farsi_date}}
     </p>
+    <div class="container d-flex justify-content-center">
+        <img alt={{ news.thumbnail }}, src={{ news.thumbnail }}>
+    </div>
+
+
+    <div class="jumbotron" id="news_image">
     <br>
     {{ news.content | safe }}
     <br>
-    <img alt={{ news.thumbnail }}, src={{ news.thumbnail }}>
+    </div>
 {% endblock %}
