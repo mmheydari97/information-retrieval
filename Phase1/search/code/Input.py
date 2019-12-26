@@ -1,81 +1,6 @@
 import re
-from hazm import *
 import itertools
-
-def Normalizing(x):
-    normalizer = Normalizer()
-    x = normalizer.normalize(x)
-    return x
-
-def CaseFolding(x):
-    x = x.replace('اطاق','اتاق')
-    x = x.replace('آیینه','آینه')
-    x = x.replace('هیات','هیئت')
-    x = x.replace('طوسی','توسی')
-    x = x.replace('بلیط','بلیت')
-    x = x.replace('ذغال','زغال')
-    x = x.replace('اسطبل','اصطبل')
-    x = x.replace('آ', 'ا')
-    
-    return x
-
-
-def Tokenization(x): ## Tokenization
-    x = word_tokenize(x)
-    return x
-
-
-def Stemming(x):
-
-    for i in range(len(x)):
-        x[i] = x[i].replace('پرندگان', 'پرنده')
-        x[i] = x[i].replace('حشرات', 'حشره')
-        x[i] = x[i].replace('مسابقات', 'مسابقه')
-
-        # تشنگان گرسنگان ستارگان نویسندگان شنوندگان چوگان زندگان آسودگان 
-        # خاطرات سبزیجات زبان دهان
-
-        x[i] = re.sub(r'\u200cهایی$', '', x[i])
-        x[i] = re.sub(r'هایی$', '', x[i])
-        x[i] = re.sub(r'\u200cهای$', '', x[i])
-        x[i] = re.sub(r'های$', '', x[i])
-        x[i] = re.sub(r'\u200cها$', '', x[i])
-        x[i] = re.sub(r'ها$', '', x[i])
-
-        x[i] = re.sub(r'ان$', '', x[i])
-
-        x[i] = re.sub(r'ات$', '', x[i])
-
-
-        somelists = [
-            ['می\u200c', ''],
-            ['کرد', 'رفت', 'شد'], 
-            ['م', 'ی', 'یم','ید', 'ند', '']
-        ]
-        verbs = []
-        for element in itertools.product(*somelists):
-            verbs.append(''.join(element))
-
-        if x[i] in verbs:
-            if x[i].startswith('می'):
-                x[i] = x[i][3:]
-            if x[i].endswith('یم') or x[i].endswith('ید') or x[i].endswith('ند'):
-                x[i] = x[i][:-2]
-            if x[i].endswith('م') or x[i].endswith('ی'):
-                x[i] = x[i][:-1]
-    return x
-
-
-frequent_words = ['.','در','از','،','؟','این','همین',':','که','است','در','می\u200cکردم', 'هم', 'او', 'و', 'وی', 'با', 'چه'
-, 'اینکه', 'کنند', 'اگر', 'من', '(', ')', 'س', 'را', 'بر', 'آن', 'نیز', 'ره', 'به', 'است', 'هست', 'یک', 'یا', 'برای'
-, 'دیگر', 'بود', 'کسی', 'هر', '/'] # ! and " should not be removed 
-
-def delete_frequents(x, frequent_words):
-    y = [w for w in x if w not in frequent_words] ## deleting frequent words
-    return y
-
-
-
+from dictionary import news_retrieval, Normalizing, CaseFolding, Tokenization, remove_frequents, Stemming
 
 def find(input, phrase): ## phrase must be 'cat' or 'source'
     result = ""
@@ -91,7 +16,6 @@ def find(input, phrase): ## phrase must be 'cat' or 'source'
         result = input[index:end]
         input = input[0:start] + input[end:] # omitting phrase
     return input, result
-
 
 
 def give_input(input):
@@ -117,9 +41,6 @@ def give_input(input):
     words = input.split(' ') ## find all tokens
 
     return words, exacts, source, cat
-
-
-
 
 
 def parse_query(input):
@@ -159,40 +80,40 @@ def parse_query2(input):
                 nots.append(w[1:])
             else:
                 words.append(w)
+ 
+    word_preprocessor, not_processor = '', ''
+    for ww in words:
+        word_preprocessor += ww + ' '
+    words = Stemming(remove_frequents(Tokenization(CaseFolding(Normalizing(news_retrieval(word_preprocessor.strip()))))))
+    # print(words)
+     
+    for ww in nots:
+        not_processor += ww + ' '
+    nots = Stemming(remove_frequents(Tokenization(CaseFolding(Normalizing(news_retrieval(not_processor.strip()))))))
+    # print(nots)
 
-    words = Stemming(words)
-    tmp = []
-    for x in words:
-        x = CaseFolding(x)
-        if x not in frequent_words:
-            tmp.append(x)
-    words = tmp
-    
-    nots = Stemming(nots)
-    tmp = []
-    for x in nots:
-        x = CaseFolding(x)
-        if x not in frequent_words:
-            tmp.append(x)
-    nots = tmp
-
-
-    for i in range(len(exacts)):
-        phrase = exacts[i]
-        phrase = CaseFolding(phrase)
-
-        res = ''
-        w = phrase.split(' ')
-        w = Stemming(w)
-    
-        for ww in w:
-            if ww in frequent_words:
-                ww = ''
-            res += ww + ' '
-
-        exacts[i] = res.strip()
-
+    ex_tmp = []
+    for e in exacts:
+        ee = Stemming(remove_frequents(Tokenization(CaseFolding(Normalizing(news_retrieval(e.strip()))))))
+        eee = ''
+        for ww in ee:
+            eee += ww + ' '
+        ex_tmp.append(eee.strip())
+    exacts = ex_tmp
+    # print(exacts)
 
     return words, exacts, nots, source, cat
 
+
+# # input = '"بازیابی اطلاعات" امیرکبیر !درس پسرها درختان شدم !رفتم'
+# # input = '"بازیابی اطلاعات" امیرکبیر !درس پسرها درختان شدم !رفتم cat:ورزش'
+# # input = '"سیستان و بلوچستان"'
+# input = '"بازیابی می سی سی پی" امپراطور !درس؟ کتاب ها گفت و گو درختان. "آقایان و خانم‌ ها" مي رفتم !رفتم cat:ورزش'
+# words, exacts, nots, source, cat = parse_query2(input)
+# # words, exacts, nots, source, cat = parse_query(input)
+# print(words)
+# print(exacts)
+# print(nots)
+# print(source)
+# print(cat)
 

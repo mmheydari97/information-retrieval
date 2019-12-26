@@ -1,9 +1,7 @@
 import pandas as pd
 import re
-from hazm import *
-import time
-import itertools
-# # from bs4 import BeautifulSoup as BS
+from dicrionaries import normalizing_dictionary, tokenizing_dictionary, verbs, casefolding, abbreviations
+from parsivar import FindStems
 
 
 
@@ -20,95 +18,100 @@ def news_retrieval(x):
     x = x.replace('&quot;', '«')
     x = x.replace('&raquo;', '»')
     x = x.replace('&quot;', '»')
+
+    x = ' ' + x + ' '  ## added
+
+    x = x.replace('»', ' »')
+    x = x.replace('«', ' «')
+    x = x.replace('؟ ', ' ؟ ')
+    x = x.replace(': ', ' : ')
+    x = x.replace('، ', ' ، ')
+    x = x.replace('. ', ' . ')
+        # x = ' '.join(x.split()) # multiplespaces to one space
     x = ' '.join(x.split()) # multiplespaces to one space
+
+    x = x.strip()  ## added
 
     return x
 
 # if 'می\u200cکردم'=='می‌کردم':
 #     print('yes')
 
-def Normalizing(x):
-    normalizer = Normalizer()
-    x = normalizer.normalize(x)
+
+def remove_frequents(x): # x is a list of strings (tokens)
+    frequent_words = ['.','در','از','،','؟','این','همین',':','که','است','در','می\u200cکردم', 'هم', 'او', 'و', 'وی', 'با', 'چه'
+    , 'اینکه', 'کنند', 'اگر', 'من', '!', '(', ')', 'س', 'را', 'بر', 'آن', 'نیز', 'ره', 'به', 'است', 'هست', 'یک', 'یا', 'برای'
+    , 'دیگر', 'بود', 'کسی', 'هر', '/'] 
+    y = [w for w in x if w not in frequent_words] ## deleting frequent words
+    return y
+
+
+def Normalizing(x): # x is a string
+    for key, value in normalizing_dictionary.items():
+        for k in key:
+            x = x.replace(k, value)
     return x
 
-def CaseFolding(x):
-    x = x.replace('اطاق','اتاق')
-    x = x.replace('آیینه','آینه')
-    x = x.replace('هیات','هیئت')
-    x = x.replace('طوسی','توسی')
-    x = x.replace('بلیط','بلیت')
-    x = x.replace('ذغال','زغال')
-    x = x.replace('اسطبل','اصطبل')
-    x = x.replace('آ', 'ا')
-    
+
+def CaseFolding(x): # x is a string
+    for key, value in casefolding.items():
+        x = x.replace(key, value)
+    for key, value in abbreviations.items():
+        x = x.replace(key, value)
     return x
 
-def Tokenization(x): ## Tokenization
-    x = word_tokenize(x)
+def Tokenization(x): ## x is a string
+    x = ' ' + x + ' '  # fix problem for first and last word
+
+    for key, value in tokenizing_dictionary.items():
+        for k in key:
+            x = x.replace(k, value)
+
+    x = x.replace(' ها ', '‌‌ها ') # آقای هاشمی problem fixed
+
+    for key, value in verbs.items():
+        for k in key:
+            x = x.replace(k, value)
+
+    x = ' '.join(x.split()) # multiplespaces to one space
+    x = x.strip()
+
+    x = x.split(' ')
+
+    for i in range(len(x)):
+        x[i] = re.sub(r'\u200c+', '\u200c', x[i])
+
+
     return x
 
 
 def Stemming(x):
 
+    my_stemmer = FindStems()
     for i in range(len(x)):
-        x[i] = x[i].replace('پرندگان', 'پرنده')
-        x[i] = x[i].replace('حشرات', 'حشره')
-        x[i] = x[i].replace('مسابقات', 'مسابقه')
+        res = my_stemmer.convert_to_stem(x[i])
+        if '&' in res:
+            pos = res.find('&')
+            res = res[0:pos]
 
-        # تشنگان گرسنگان ستارگان نویسندگان شنوندگان چوگان زندگان آسودگان سیستان بلوچستان
-        # خاطرات سبزیجات زبان دهان
-
-        x[i] = re.sub(r'\u200cهایی$', '', x[i])
-        x[i] = re.sub(r'هایی$', '', x[i])
-        x[i] = re.sub(r'\u200cهای$', '', x[i])
-        x[i] = re.sub(r'های$', '', x[i])
-        x[i] = re.sub(r'\u200cها$', '', x[i])
-        x[i] = re.sub(r'ها$', '', x[i])
-
-        x[i] = re.sub(r'ان$', '', x[i])
-
-        x[i] = re.sub(r'ات$', '', x[i])
-
-
-        somelists = [
-            ['می\u200c', ''],
-            ['کرد', 'رفت', 'شد'], 
-            ['م', 'ی', 'یم','ید', 'ند', '']
-        ]
-        verbs = []
-        for element in itertools.product(*somelists):
-            verbs.append(''.join(element))
-
-        if x[i] in verbs:
-            if x[i].startswith('می'):
-                x[i] = x[i][3:]
-            if x[i].endswith('یم') or x[i].endswith('ید') or x[i].endswith('ند'):
-                x[i] = x[i][:-2]
-            if x[i].endswith('م') or x[i].endswith('ی'):
-                x[i] = x[i][:-1]
+        # solving problem with می‌توانسته‌ام
+        if res.startswith('می\u200c') and res!='می‌سی‌سی‌پی':
+            res = my_stemmer.convert_to_stem(x[i][3:])
+            if '&' in res:
+                pos = res.find('&')
+                res = res[0:pos]
+            elif res.endswith(''):
+                res = my_stemmer.convert_to_stem(x[i][:-1])
+                if '&' in res:
+                    pos = res.find('&')
+                    res = res[0:pos]
+        x[i] = res
     return x
 
 
-frequent_words = ['.','در','از','،','؟','این','همین',':','که','است','در','می\u200cکردم', 'هم', 'او', 'و', 'وی', 'با', 'چه'
-, 'اینکه', 'کنند', 'اگر', 'من', '!', '(', ')', 'س', 'را', 'بر', 'آن', 'نیز', 'ره', 'به', 'است', 'هست', 'یک', 'یا', 'برای'
-, 'دیگر', 'بود', 'کسی', 'هر', '/'] 
-## removing all one characters??? ! ? ( ) ع س : « » , ...
-### what about numbers????
-## نیروهای -  استانداردهای - 
-# رسانه\u200cای
-# واین 1
-# اقتباس شده ۱
-# کرده است ۱
-# سده اخیر
-# شناخته_شد 2 
-# پرداخته_است 2
 
 
-# 'رفتارهایی'
-def delete_frequents(x, frequent_words):
-    y = [w for w in x if w not in frequent_words] ## deleting frequent words
-    return y
+
 
 
 def add_word(doc_id, list_of_words, dic):
@@ -118,7 +121,7 @@ def add_word(doc_id, list_of_words, dic):
         # print(word)
         if word not in dic:  ### if word is not in the dictionary
             dic[word] = [[doc_id, [i]]]
-            # print('AAA')
+
         else:                  ### if word is in the dictionary
             list_1 = dic[word]
             flag = False
@@ -134,58 +137,59 @@ def add_word(doc_id, list_of_words, dic):
                 tmp[1].append(position)
                 list_1[index] = tmp
                 dic[word] = list_1
-                # print('BBB')
+             
             else:   ### if word is occuring for the first time in this doc_id
                 list_ = dic[word]
                 list_.append([doc_id,[position]])
                 dic[word] = list_
-                # print('CCC')
-
+            
     return dic
-
-
-
 
 
 def give_dictionary():
     dic = {}
     # dfs = pd.read_excel('./../../News.xlsx')
-    dfs = pd.read_excel('~/Codes/IR/Phase1/News.xlsx')
+    # dfs = pd.read_excel('/home/mohammad/Documents/University/S9/IR/Project/main/News.xlsx')
+    dfs = pd.read_excel('IR-F19-Project01-Input-2k.xlsx')
     
     contents = dfs['content']
-    # doc_number = [i for i in range(10)]
+    # doc_number = [i for i in range(1)]
     doc_number = [i for i in range(len(contents))]
     doc_number = list(set(doc_number) - set([1702, 1346, 1159, 1068, 1018, 907]))
-    # indexes = [i for i in range(10)]
 
     for doc_id in doc_number:
         x = contents[doc_id]
         x = news_retrieval(x) # واکشی
 
-        x = CaseFolding(x) # همسازی سازی
-
-        # print(x)
         x = Normalizing(x)
+        x = CaseFolding(x)
+
         # print(x)
         x = Tokenization(x) # استخراج توکن
+        x = remove_frequents(x)
         # print(x)
-        
+     
         x = Stemming(x) ## ریشه یابی
 
-
-        y = delete_frequents(x, frequent_words) # حذف پرتکرارها
-
-        for i in range(len(y)):
-            y[i] = re.sub(r'\u200c+', '\u200c', y[i])
-
-        dic = add_word(doc_id, y, dic) # ایجاد شاخص معکوس مکانی
+        dic = add_word(doc_id, x, dic) # ایجاد شاخص معکوس مکانی
     
     return dic
 
-dic = give_dictionary()
+# start = time.time()
+# dic = give_dictionary()
+# end = time.time()
+# print(end - start)
+
+
 # import json
-# with open('dic.txt', 'w') as file:
+# with open('dict1.txt', 'w') as file:
 #     file.write(json.dumps(dic, ensure_ascii=False).encode('utf8').decode())
+
+
+### code for removing duplicates
+# seen = set()
+# seen_add = seen.add
+# y = [x for x in y if not (x in seen or seen_add(x))]
 
 
 
