@@ -27,7 +27,7 @@
 
     <div class="jumbotron" id="news_image">
     <br>
-    {{ news.content | safe }}
+    {{ news.content | safe | highlight_text:words }}
     <br>
     </div>
 {% endblock %}

@@ -162,7 +162,7 @@ def give_dictionary():
     dic = {}
     # dfs = pd.read_excel('./../../News.xlsx')
     # dfs = pd.read_excel('/home/mohammad/Documents/University/S9/IR/Project/main/News.xlsx')
-    dfs = pd.read_csv('IR-F19-Project02-14k.csv')
+    dfs = pd.read_csv('IR-F19-Project02-14k.csv')[:1000]
     
     contents = dfs['content']
     # doc_number = [i for i in range(1)]

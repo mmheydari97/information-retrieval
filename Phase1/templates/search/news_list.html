@@ -17,7 +17,7 @@
         <div class="card">
                 <div class="card-body">
 
-                    <h3><a href="{% url 'news_detail' pk=news.pk %}">{{ news.title| highlight_text:highlights }}</a></h3>
+                    <h3><a href="{% url 'news_detail' pk=news.pk %}">{{ news.title }}</a></h3>
 
 
                     <div class="date">
@@ -25,7 +25,7 @@
                     </div>
 
                     <p>
-                        {{ news.summary | highlight_text:highlights }}
+                        {{ news.summary }}
                     </p>
                 </div>
         </div>

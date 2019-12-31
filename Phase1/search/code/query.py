@@ -22,6 +22,7 @@ def words_query(word, dic): # returns doc_ids that include 'word'.  e.g. [1, 2]
 # print(words_query('مقام', dic))
 # print(words_query('بازیابی', dic))
 
+
 def postings(word, doc_id, dic): # returns position of 'word' in document=doc_id.  e.g. [1, 21, 59, 121]
     docs = dic[word]
     for d in docs:
