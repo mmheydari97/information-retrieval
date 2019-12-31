@@ -1,6 +1,8 @@
 import pandas as pd
 import re
-from dicrionaries import normalizing_dictionary, tokenizing_dictionary, verbs, casefolding, abbreviations
+import time
+import itertools
+from search.code.dictionaries import normalizing_dictionary, tokenizing_dictionary, verbs, casefolding, abbreviations
 from parsivar import FindStems
 
 
@@ -19,18 +21,25 @@ def news_retrieval(x):
     x = x.replace('&raquo;', '»')
     x = x.replace('&quot;', '»')
 
-    x = ' ' + x + ' '  ## added
 
-    x = x.replace('»', ' »')
-    x = x.replace('«', ' «')
-    x = x.replace('؟ ', ' ؟ ')
-    x = x.replace(': ', ' : ')
-    x = x.replace('، ', ' ، ')
-    x = x.replace('. ', ' . ')
+    x = ' ' + x + ' '
+
+    x = x.replace('»', ' » ')
+    x = x.replace('«', ' « ')
+    x = x.replace('؟', ' ؟ ')
+    x = x.replace(':', ' : ')
+    x = x.replace('،', ' ، ')
+    x = x.replace('.', ' . ')
+    x = x.replace(')', ' ) ')
+    x = x.replace('(', ' ( ')
+    x = x.replace('-', ' - ')
+    x = x.replace('»', ' » ')
+    x = x.replace('«', ' « ')
+    x = x.replace('/', ' / ')
         # x = ' '.join(x.split()) # multiplespaces to one space
     x = ' '.join(x.split()) # multiplespaces to one space
 
-    x = x.strip()  ## added
+    x = x.strip()
 
     return x
 
@@ -39,9 +48,9 @@ def news_retrieval(x):
 
 
 def remove_frequents(x): # x is a list of strings (tokens)
-    frequent_words = ['.','در','از','،','؟','این','همین',':','که','است','در','می\u200cکردم', 'هم', 'او', 'و', 'وی', 'با', 'چه'
+    frequent_words = ['.', '«', '»', 'در','از','،','؟','این','همین',':','که','است','در','می\u200cکردم', 'هم', 'او', 'و', 'وی', 'با', 'چه'
     , 'اینکه', 'کنند', 'اگر', 'من', '!', '(', ')', 'س', 'را', 'بر', 'آن', 'نیز', 'ره', 'به', 'است', 'هست', 'یک', 'یا', 'برای'
-    , 'دیگر', 'بود', 'کسی', 'هر', '/'] 
+    , 'دیگر', 'بود', 'کسی', 'هر', '/', '-'] 
     y = [w for w in x if w not in frequent_words] ## deleting frequent words
     return y
 
@@ -81,7 +90,10 @@ def Tokenization(x): ## x is a string
     for i in range(len(x)):
         x[i] = re.sub(r'\u200c+', '\u200c', x[i])
 
-
+    for i in range(len(x)):
+        if x[i].endswith('\u200c'):
+            x[i] = x[i][:-1]
+            
     return x
 
 
@@ -150,12 +162,12 @@ def give_dictionary():
     dic = {}
     # dfs = pd.read_excel('./../../News.xlsx')
     # dfs = pd.read_excel('/home/mohammad/Documents/University/S9/IR/Project/main/News.xlsx')
-    dfs = pd.read_excel('IR-F19-Project01-Input-2k.xlsx')
+    dfs = pd.read_csv('IR-F19-Project02-14k.csv')
     
     contents = dfs['content']
     # doc_number = [i for i in range(1)]
     doc_number = [i for i in range(len(contents))]
-    doc_number = list(set(doc_number) - set([1702, 1346, 1159, 1068, 1018, 907]))
+    # doc_number = list(set(doc_number) - set([1702, 1346, 1159, 1068, 1018, 907]))
 
     for doc_id in doc_number:
         x = contents[doc_id]

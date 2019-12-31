@@ -1,4 +1,5 @@
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -50,3 +51,13 @@ def farsi_date(value):
         parts[2] = "دسامبر"
 
     return "{}، {} {} {}".format(parts[0], parts[1], parts[2], parts[3])
+
+
+@register.filter(name='highlight_text')
+def highlight_text(value, arr):
+    res = ""
+    for a in str(value).split():
+        if a in arr:
+            a = "<mark>"+a+"</mark>"
+        res += a + " "
+    return mark_safe(res)
